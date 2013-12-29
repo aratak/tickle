@@ -19,9 +19,8 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require_relative "../numerizer/numerizer.rb"
-
 module Tickle
+
   class << self
     # == Configuration options
     #
@@ -197,7 +196,7 @@ module Tickle
     # ordinals (third => 3rd)
     def normalize(text) #:nodoc:
       normalized_text = text.to_s.downcase
-      normalized_text = Numerizer.numerize(normalized_text)
+      normalized_text = Chronic::Numerizer.numerize(normalized_text)
       normalized_text.gsub!(/['"\.]/, '')
       normalized_text.gsub!(/([\/\-\,\@])/) { ' ' + $1 + ' ' }
       normalized_text
