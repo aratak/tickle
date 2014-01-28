@@ -12,6 +12,10 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))     # For use/testing when no gem is 
 require 'date'
 require 'time'
 require 'chronic'
+# require 'active_support/core_ext/numeric'
+# require 'active_support/core_ext/integer'
+# require 'active_support/duration'
+require 'active_support/time'
 
 require 'tickle/tickle'
 require 'tickle/handler'

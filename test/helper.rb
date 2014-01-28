@@ -12,5 +12,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'tickle')
 
+Tickle.debug = true
+
 class Test::Unit::TestCase
 end
