@@ -42,13 +42,6 @@ module Tickle #:nodoc:
 end
 
 class Date #:nodoc:
-  # returns the days in the sending month
-  def days_in_month
-    d,m,y = mday,month,year
-    d += 1 while Date.valid_civil?(y,m,d)
-    d - 1
-  end
-
   def bump(type, amount=nil)
     amount ||= 1
     case type

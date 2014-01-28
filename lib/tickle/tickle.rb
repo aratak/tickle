@@ -49,7 +49,7 @@ module Tickle
       raise(InvalidArgumentException, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
 
       # check to see if a valid datetime was passed
-      return text if text.is_a?(Date) ||  text.is_a?(Time)
+      return text if text.is_a?(Date) || text.is_a?(Time)
 
       # check to see if this event starts some other time and reset now
       event = scan_expression(text, options)
@@ -264,16 +264,17 @@ module Tickle
       month = number.to_i < @start.day ? (@start.month == 12 ? 1 : @start.month + 1) : @start.month
     end
 
-    def next_appropriate_year(month, day)
-      year = (Date.new(@start.year.to_i, month.to_i, day.to_i) == @start.to_date) ? @start.year + 1 : @start.year
-      return year
-    end
+    # Used only by holidays
+    # def next_appropriate_year(month, day)
+    #   year = (Date.new(@start.year.to_i, month.to_i, day.to_i) == @start.to_date) ? @start.year + 1 : @start.year
+    #   return year
+    # end
 
     # Return the number of days in a specified month.
     # If no month is specified, current month is used.
     def days_in_month(month=nil)
       month ||= Date.today.month
-      days_in_mon = Date.civil(Date.today.year, month, -1).day
+      Time.days_in_month(month)
     end
 
     private
@@ -283,7 +284,7 @@ module Tickle
     # if, however, a date expression was passed we evaluate and shift forward if needed
     def chronic_parse(exp)
       result = Chronic.parse(exp.ordinal_as_number)
-      result = Time.local(result.year + 1, result.month, result.day, result.hour, result.min, result.sec) if result && result.to_time < Time.now
+      result = result + 1.year if result && result.to_time < Time.now
       Tickle.dwrite("Chronic.parse('#{exp}') # => #{result}")
       result
     end

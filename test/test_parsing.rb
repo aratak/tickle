@@ -176,9 +176,21 @@ class TestParsing < Test::Unit::TestCase
       time = Tickle.parse(nil)
     end
 
+    assert_raise(Tickle::InvalidArgumentException) do
+      time = Tickle.parse('every other day', start: 'invalid')
+    end
+
     assert_raise(Tickle::InvalidDateExpression) do
       past_date = Date.civil(Date.today.year, Date.today.month, Date.today.day - 1)
       time = Tickle.parse("every other day", {:start => past_date})
+    end
+
+    assert_raise(Tickle::InvalidDateExpression) do
+      time = Tickle.parse('every other day starting invalid')
+    end
+
+    assert_raise(Tickle::InvalidDateExpression) do
+      time = Tickle.parse('every other day ending invalid')
     end
 
     assert_raise(Tickle::InvalidDateExpression) do
