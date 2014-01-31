@@ -23,7 +23,6 @@ require 'tickle/repeater'
 #require 'numerizer/numerizer'
 
 module Tickle #:nodoc:
-  VERSION = "0.1.7"
 
   def self.debug=(val); @debug = val; end
 
@@ -37,40 +36,6 @@ module Tickle #:nodoc:
       return true
     rescue Exception => e
       return false
-    end
-  end
-end
-
-class Date #:nodoc:
-  def bump(type, amount=nil)
-    amount ||= 1
-    case type
-    when :day, :week, :month, :year then
-      self + amount.send(type)
-    when :wday then
-      amount = Date::ABBR_DAYNAMES.index(amount) if amount.is_a?(String)
-      raise Exception, "specified day of week invalid.  Use #{Date::ABBR_DAYNAMES}" unless amount
-      diff = (amount > self.wday) ? (amount - self.wday) : (7 - (self.wday - amount))
-      self + diff.days
-    else
-      raise Exception, "type \"#{type}\" not supported."
-    end
-  end
-end
-
-class Time #:nodoc:
-  def bump(type, amount=nil)
-    amount ||= 1
-    case type
-    when :sec, :min, :hour, :day, :week, :month, :year then
-      self + amount.send(type)
-    when :wday then
-      amount = Time::RFC2822_DAY_NAME.index(amount) if amount.is_a?(String)
-      raise Exception, "specified day of week invalid.  Use #{Time::RFC2822_DAY_NAME}" unless amount
-      diff = (amount > self.wday) ? (amount - self.wday) : (7 - (self.wday - amount))
-      self + diff.days
-    else
-      raise Exception, "type \"#{type}\" not supported."
     end
   end
 end
@@ -110,12 +75,5 @@ class String #:nodoc:
     result = self
     scanner.keys.each {|scanner_item| result = scanner[scanner_item] if scanner_item =~ self}
     return result.gsub(/\b(\d*)(st|nd|rd|th)\b/, '\1')
-  end
-end
-
-class Array #:nodoc:
-  # compares two arrays to determine if they both contain the same elements
-  def same?(y)
-    self.sort == y.sort
   end
 end

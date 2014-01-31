@@ -17,38 +17,38 @@ class TestParsing < Test::Unit::TestCase
   def test_parse_best_guess_simple
     start = Date.new(2020, 04, 01)
 
-    assert_date_match(@date.bump(:day, 1), 'each day')
-    assert_date_match(@date.bump(:day, 1), 'every day')
-    assert_date_match(@date.bump(:week, 1), 'every week')
-    assert_date_match(@date.bump(:month, 1), 'every month')
-    assert_date_match(@date.bump(:year, 1), 'every year')
+    assert_date_match(@date + 1.day, 'each day')
+    assert_date_match(@date + 1.day, 'every day')
+    assert_date_match(@date + 1.week, 'every week')
+    assert_date_match(@date + 1.month, 'every month')
+    assert_date_match(@date + 1.year, 'every year')
 
-    assert_date_match(@date.bump(:day, 1), 'daily')
-    assert_date_match(@date.bump(:week, 1) , 'weekly')
-    assert_date_match(@date.bump(:month, 1) , 'monthly')
-    assert_date_match(@date.bump(:year, 1) , 'yearly')
+    assert_date_match(@date + 1.day, 'daily')
+    assert_date_match(@date + 1.week , 'weekly')
+    assert_date_match(@date + 1.month , 'monthly')
+    assert_date_match(@date + 1.year , 'yearly')
 
-    assert_date_match(@date.bump(:day, 3), 'every 3 days')
-    assert_date_match(@date.bump(:week, 3), 'every 3 weeks')
-    assert_date_match(@date.bump(:month, 3), 'every 3 months')
-    assert_date_match(@date.bump(:year, 3), 'every 3 years')
+    assert_date_match(@date + 3.days, 'every 3 days')
+    assert_date_match(@date + 3.weeks, 'every 3 weeks')
+    assert_date_match(@date + 3.months, 'every 3 months')
+    assert_date_match(@date + 3.years, 'every 3 years')
 
-    assert_date_match(@date.bump(:day, 2), 'every other day')
-    assert_date_match(@date.bump(:week, 2), 'every other week')
-    assert_date_match(@date.bump(:month, 2), 'every other month')
-    assert_date_match(@date.bump(:year, 2), 'every other year')
+    assert_date_match(@date + 2.days, 'every other day')
+    assert_date_match(@date + 2.weeks, 'every other week')
+    assert_date_match(@date + 2.months, 'every other month')
+    assert_date_match(@date + 2.years, 'every other year')
 
-    assert_date_match(@date.bump(:wday, 'Mon'), 'every Monday')
-    assert_date_match(@date.bump(:wday, 'Wed'), 'every Wednesday')
-    assert_date_match(@date.bump(:wday, 'Fri'), 'every Friday')
+    assert_date_match(Chronic.parse('next monday', now: @date), 'every Monday')
+    assert_date_match(Chronic.parse('next wednesday', now: @date), 'every Wednesday')
+    assert_date_match(Chronic.parse('next friday', now: @date), 'every Friday')
 
     assert_date_match(Date.new(2021, 2, 1), 'every February', {:start => start, :now => start})
     assert_date_match(Date.new(2020, 5, 1), 'every May', {:start => start, :now => start})
     assert_date_match(Date.new(2020, 6, 1), 'every june', {:start => start, :now => start})
 
-    assert_date_match(@date.bump(:wday, 'Sun'), 'beginning of the week')
-    assert_date_match(@date.bump(:wday, 'Wed'), 'middle of the week')
-    assert_date_match(@date.bump(:wday, 'Sat'), 'end of the week')
+    assert_date_match(Chronic.parse('next sunday', now: @date), 'beginning of the week')
+    assert_date_match(Chronic.parse('next wednesday', now: @date), 'middle of the week')
+    assert_date_match(Chronic.parse('next saturday', now: @date), 'end of the week')
 
     assert_date_match(Date.new(2020, 05, 01), 'beginning of the month', {:start => start, :now => start})
     assert_date_match(Date.new(2020, 04, 15), 'middle of the month', {:start => start, :now => start})
@@ -88,12 +88,12 @@ class TestParsing < Test::Unit::TestCase
   def test_parse_best_guess_complex
     start = Date.new(2020, 04, 01)
 
-    assert_tickle_match(@date.bump(:day, 1), @date, @date.bump(:week, 1), 'day', 'starting today and ending one week from now') if Time.now.hour < 21 # => demonstrates leaving out the actual time period and implying it as daily
-    assert_tickle_match(@date.bump(:day, 1), @date.bump(:day, 1), @date.bump(:week, 1), 'day','starting tomorrow and ending one week from now') # => demonstrates leaving out the actual time period and implying it as daily.
+    assert_tickle_match(@date + 1.day, @date, @date + 1.week, 'day', 'starting today and ending one week from now') if Time.now.hour < 21 # => demonstrates leaving out the actual time period and implying it as daily
+    assert_tickle_match(@date + 1.day, @date + 1.day, @date + 1.week, 'day','starting tomorrow and ending one week from now') # => demonstrates leaving out the actual time period and implying it as daily.
 
-    assert_tickle_match(@date.bump(:wday, 'Mon'), @date.bump(:wday, 'Mon'), nil, 'month', 'starting Monday repeat every month')
+    assert_tickle_match(Chronic.parse('next monday', now: @date), Chronic.parse('next monday', now: @date), nil, 'month', 'starting Monday repeat every month')
 
-    year = @date >= Date.new(@date.year, 5, 13) ? @date.bump(:year,1) : @date.year
+    year = @date >= Date.new(@date.year, 5, 13) ? @date + 1.year : @date.year
     assert_tickle_match(Date.new(year, 05, 13), Date.new(year, 05, 13), nil, 'week', 'starting May 13th repeat every week')
     assert_tickle_match(Date.new(year, 05, 13), Date.new(year, 05, 13), nil, 'other day', 'starting May 13th repeat every other day')
     assert_tickle_match(Date.new(year, 05, 13), Date.new(year, 05, 13), nil, 'other day', 'every other day starts May 13th')
@@ -101,16 +101,16 @@ class TestParsing < Test::Unit::TestCase
     assert_tickle_match(Date.new(year, 05, 13), Date.new(year, 05, 13), nil, 'other day', 'every other day starting May 13th')
     assert_tickle_match(Date.new(year, 05, 13), Date.new(year, 05, 13), nil, 'other day', 'every other day starting May 13')
 
-    assert_tickle_match(@date.bump(:wday, 'Wed'), @date.bump(:wday, 'Wed'), nil, 'week', 'every week starts this wednesday')
-    assert_tickle_match(@date.bump(:wday, 'Wed'), @date.bump(:wday, 'Wed'), nil, 'week', 'every week starting this wednesday')
+    assert_tickle_match(Chronic.parse('next wednesday', now: @date), Chronic.parse('next wednesday', now: @date), nil, 'week', 'every week starts this wednesday')
+    assert_tickle_match(Chronic.parse('next wednesday', now: @date), Chronic.parse('next wednesday', now: @date), nil, 'week', 'every week starting this wednesday')
 
-    assert_tickle_match(Date.new(2021, 05, 01), Date.new(2021, 05, 01), nil, 'other day', "every other day starting May 1st #{start.bump(:year, 1).year}")
-    assert_tickle_match(Date.new(2021, 05, 01), Date.new(2021, 05, 01), nil, 'other day',  "every other day starting May 1 #{start.bump(:year, 1).year}")
-    assert_tickle_match(@date.bump(:wday, 'Sun'), @date.bump(:wday, 'Sun'),  nil, 'other week',  'every other week starting this Sunday')
+    assert_tickle_match(Date.new(2021, 05, 01), Date.new(2021, 05, 01), nil, 'other day', "every other day starting May 1st #{(start + 1.year).year}")
+    assert_tickle_match(Date.new(2021, 05, 01), Date.new(2021, 05, 01), nil, 'other day',  "every other day starting May 1 #{(start + 1.year).year}")
+    assert_tickle_match(Chronic.parse('next sunday', now: @date), Chronic.parse('next sunday', now: @date),  nil, 'other week',  'every other week starting this Sunday')
 
-    assert_tickle_match(@date.bump(:wday, 'Wed'), @date.bump(:wday, 'Wed'), Date.new(year, 05, 13), 'week', 'every week starting this wednesday until May 13th')
-    assert_tickle_match(@date.bump(:wday, 'Wed'), @date.bump(:wday, 'Wed'), Date.new(year, 05, 13), 'week', 'every week starting this wednesday ends May 13th')
-    assert_tickle_match(@date.bump(:wday, 'Wed'), @date.bump(:wday, 'Wed'), Date.new(year, 05, 13), 'week', 'every week starting this wednesday ending May 13th')
+    assert_tickle_match(Chronic.parse('next wednesday', now: @date), Chronic.parse('next wednesday', now: @date), Date.new(year, 05, 13), 'week', 'every week starting this wednesday until May 13th')
+    assert_tickle_match(Chronic.parse('next wednesday', now: @date), Chronic.parse('next wednesday', now: @date), Date.new(year, 05, 13), 'week', 'every week starting this wednesday ends May 13th')
+    assert_tickle_match(Chronic.parse('next wednesday', now: @date), Chronic.parse('next wednesday', now: @date), Date.new(year, 05, 13), 'week', 'every week starting this wednesday ending May 13th')
   end
 
   def test_tickle_args
@@ -118,15 +118,15 @@ class TestParsing < Test::Unit::TestCase
     assert(Date.new(2020, 05, 01).to_date == actual_next_only, "\"May 1st, 2011\" :next parses to #{actual_next_only} but should be equal to #{Date.new(2020, 05, 01).to_date}")
 
     start_date = Time.now
-    assert_tickle_match(start_date.bump(:day, 3), @date, nil, '3 days', 'every 3 days', {:start => start_date})
-    assert_tickle_match(start_date.bump(:week, 3), @date, nil, '3 weeks', 'every 3 weeks', {:start => start_date})
-    assert_tickle_match(start_date.bump(:month, 3), @date, nil, '3 months', 'every 3 months', {:start => start_date})
-    assert_tickle_match(start_date.bump(:year, 3), @date, nil, '3 years', 'every 3 years', {:start => start_date})
+    assert_tickle_match(start_date + 3.days, @date, nil, '3 days', 'every 3 days', {:start => start_date})
+    assert_tickle_match(start_date + 3.weeks, @date, nil, '3 weeks', 'every 3 weeks', {:start => start_date})
+    assert_tickle_match(start_date + 3.months, @date, nil, '3 months', 'every 3 months', {:start => start_date})
+    assert_tickle_match(start_date + 3.years, @date, nil, '3 years', 'every 3 years', {:start => start_date})
 
-    end_date = Date.civil(Date.today.year, Date.today.month+5, Date.today.day).to_time
-    assert_tickle_match(start_date.bump(:day, 3), @date, start_date.bump(:month, 5), '3 days', 'every 3 days', {:start => start_date, :until  => end_date})
-    assert_tickle_match(start_date.bump(:week, 3), @date, start_date.bump(:month, 5), '3 weeks', 'every 3 weeks', {:start => start_date, :until  => end_date})
-    assert_tickle_match(start_date.bump(:month, 3), @date, start_date.bump(:month, 5), '3 months', 'every 3 months', {:until => end_date})
+    end_date = (Date.today + 5.months).to_time
+    assert_tickle_match(start_date + 3.days, @date, start_date + 5.months, '3 days', 'every 3 days', {:start => start_date, :until  => end_date})
+    assert_tickle_match(start_date + 3.weeks, @date, start_date + 5.months, '3 weeks', 'every 3 weeks', {:start => start_date, :until  => end_date})
+    assert_tickle_match(start_date + 3.months, @date, start_date + 5.months, '3 months', 'every 3 months', {:until => end_date})
   end
 
   # def test_us_holidays
