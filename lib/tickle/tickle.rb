@@ -284,7 +284,7 @@ module Tickle
     # if, however, a date expression was passed we evaluate and shift forward if needed
     def chronic_parse(exp)
       result = Chronic.parse(exp.ordinal_as_number)
-      result = result + 1.year if result && result.to_time < Time.now
+      result = result + 1.year if result && result.to_date < Date.today
       Tickle.dwrite("Chronic.parse('#{exp}') # => #{result}")
       result
     end
