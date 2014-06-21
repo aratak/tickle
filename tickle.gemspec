@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "chronic" #, "~> 0.2.3"
-  s.add_dependency "activesupport", "~> 3.2.0"
+  s.add_dependency "activesupport" #, "~> 3.2.0"
 
   s.add_development_dependency "bundler", "~> 1.2"
   s.add_development_dependency "shoulda", "~> 2.10.3"
